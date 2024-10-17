@@ -2,11 +2,12 @@
 
 Make laughter contagious.
 
-## getting started
+## Getting started
 
-1. clone the repo
+1. Clone the repo
 2. `pip install -r requirements.txt`
 3. `python main.py`
+4. Laugh
 
 
 
