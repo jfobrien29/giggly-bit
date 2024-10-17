@@ -108,7 +108,8 @@ def detect_laughter(audio_path: str) -> list[LaughterDetectionOutput]:
   ret = []
   for index, instance in enumerate(instances):
     laughs = cut_laughter_segments([instance],full_res_y,full_res_sr)
-    wav_path = OUTPUT_DIR + "/laugh_" + str(index) + ".wav"
+    output_dir = os.path.dirname(os.path.abspath(audio_path))
+    wav_path = os.path.join(output_dir, f'laugh_{index}.wav')
     scipy.io.wavfile.write(wav_path, full_res_sr, (laughs * maxv).astype(np.int16))
     ret.append(LaughterDetectionOutput(wav_path, instance[0], instance[1]))
 
