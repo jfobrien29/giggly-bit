@@ -3,16 +3,21 @@ import wave
 import numpy as np
 import time
 import os
+import torch
 from pydub import AudioSegment
 from pydub.playback import play
 from src.laughter_detection import detect_laughter
+from src import laughter_detection_models as models
+
+MODEL_CKPT_PATH = './model_checkpoints/best.pth.tar'
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # Constants
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-RECORD_SECONDS = 5
+RECORD_SECONDS = 3
 WAVE_OUTPUT_FILENAME = "temp_audio.wav"
 
 # Initialize PyAudio
@@ -49,13 +54,23 @@ def record_audio():
     wf.close()
 
 def main_loop():
+    model = models.ResNetBigger(
+        dropout_rate=0.0,
+        linear_layer_size=128,
+        filter_sizes=[128, 64, 32, 32],
+    )
+    model.load_state_dict(torch.load(MODEL_CKPT_PATH, map_location='cpu')['state_dict'])
+    model.to(DEVICE)
+    model.eval()
+
+
     try:
         while True:
             # Record audio
             record_audio()
 
             # Detect laughter
-            laughter_data = detect_laughter(WAVE_OUTPUT_FILENAME)
+            laughter_data = detect_laughter(WAVE_OUTPUT_FILENAME, model)
 
             if laughter_data:
                 print("Laughter detected!")

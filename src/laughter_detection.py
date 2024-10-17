@@ -6,15 +6,11 @@ import dataclasses
 import numpy as np
 import os
 import librosa
-import torch
 import scipy
 import scipy.signal as signal 
-
+import torch
 from tqdm import tqdm
 
-from . import laughter_detection_models as models
-
-MODEL_CKPT_PATH = './model_checkpoints/best.pth.tar'
 HOP_LENGTH = 186
 N_FRAMES = 44
 SAMPLE_RATE = 8000
@@ -32,23 +28,12 @@ class LaughterDetectionOutput:
   start_ts: float
   end_ts: float
 
-def detect_laughter(audio_path: str) -> list[LaughterDetectionOutput]:
+def detect_laughter(audio_path: str, model: torch.nn.Module) -> list[LaughterDetectionOutput]:
   y, _ = librosa.load(audio_path, sr=SAMPLE_RATE)
   S = librosa.feature.melspectrogram(y=y, sr=SAMPLE_RATE, hop_length=HOP_LENGTH).T
   features = librosa.amplitude_to_db(S, ref=np.max)
   print('Features')
   print(features)
-
-  # set from here till probs on Modal
-  model = models.ResNetBigger(
-    dropout_rate=0.0,
-    linear_layer_size=128,
-    filter_sizes=[128, 64, 32, 32],
-  )
-  model.load_state_dict(torch.load(MODEL_CKPT_PATH, map_location='cpu')['state_dict'])
-  model.to(DEVICE)
-  model.eval()
-  print('Model Loaded')
 
   probs = []
   for i in tqdm(range(0, len(features) - N_FRAMES - 1, BATCH_SIZE)):
