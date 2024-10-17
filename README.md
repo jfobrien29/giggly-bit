@@ -1,4 +1,4 @@
-# GIGGLY BOT
+# GIGGLY BIT
 
 Make laughter contagious.
 
