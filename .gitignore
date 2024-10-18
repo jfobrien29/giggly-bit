@@ -14,3 +14,5 @@ myenv/lib/python3.9/site-packages/torch/lib/libtorch_cpu.dylibmyenv/
 
 __pycache__
 .env
+
+laugh_*
